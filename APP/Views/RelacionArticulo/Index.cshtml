@@ -1,0 +1,111 @@
+﻿@using Api.Dtos.Bodega
+@using Api.Dtos.RelacionArticulo
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var bodegas = ViewBag.Bodegas as List<BodegaDto>;
+    var relacionArticulo = ViewBag.relacionArticulo as List<RelacionArticuloDto> ?? new List<RelacionArticuloDto>(); ;
+}
+
+<style>
+    .agregar {
+        position: fixed;
+        bottom: 10%;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        font-size: 24px;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+
+        .agregar:hover {
+            background-color: #218838;
+        }
+</style>
+
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">ADMINISTRACION DE ARTICULOS </h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-2">
+
+            @using (Html.BeginForm("FiltrarRelacionArticulo", "RelacionArticulo", FormMethod.Post, new { id = "formFiltro" }))
+            {
+                <div class="col-12 col-sm-12 col-xl-12 col-md-12 col-lg-12">
+                    <div class="form-group">
+                        <label for="cmbBodegaPosicion">Bodegas:</label>
+                        <select   id="cmbBodegaPosicion" class=" select2 form-control" name="codigoBodega" onchange="document.getElementById('formFiltro').submit();">
+                            <option value="">SELECCIONAR LA BODEGA</option>
+                            @foreach (var bodega in ViewBag.Bodegas as List<BodegaDto>)
+                            {
+                                <option value="@bodega.strCodBodega">@bodega.strCodBodega - @bodega.strBodega</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+            }
+
+
+
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-12 col-xl-12 col-lg-12 col-sm-12">
+                <div class="table-responsive text-nowrap">
+
+                    @await Html.PartialAsync("_TableRelacionArticulo", relacionArticulo)
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="agregar">
+    <a asp-action="Create" class="btn"> <i style="color:white" class="fas fa-plus"></i></a>
+</div>
+@section ScriptRelacionArticulo{
+    <script>
+
+        $(document).ready(() => {
+
+
+            $('#tblRelacionArticulo').DataTable({
+                "dom": '<"row"<"col-md-12"f>>rt<"bottom"lp><"clear">',
+                "bDeferRender": true,
+
+                "pageLength": 15,
+                "searching": true,
+                "autoWidth": true,
+                "lengthChange": false,
+                "info": false,
+                "language": {
+                    "emptyTable": "NO HAY DATOS REGISTRADOS",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "infoFiltered": "(Filtrado de _MAX_ total registros)",
+                    "search": "<b>BUSCAR: </b>",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        });
+    </script>
+}

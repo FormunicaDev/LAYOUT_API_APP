@@ -1,0 +1,183 @@
+﻿@using Api.Dtos.Bodega
+@using Api.Dtos.Posicion
+
+@{
+    var bodegas = ViewBag.Bodegas as List<BodegaDto>;
+    var posicion = ViewBag.Posiciones as List<PosicionDto>;
+}
+<style>
+    .agregar {
+        position: fixed;
+        bottom: 10%;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        font-size: 24px;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+    .agregar:hover {
+        background-color: #218838;
+    }
+    #tblPosicion{
+        width:100%;
+        table-layout:revert;
+       
+    }
+    .dataTables_filter {
+        padding-top: 2%;
+        display: flex; /* Usamos flexbox */
+        justify-content: flex-start; /* Alineamos al inicio (izquierda) */
+        width: 100%; /* Asegura que use todo el ancho disponible */
+        margin-bottom: 10px; /* Espacio entre el input y la tabla */
+        margin-left:10px;
+    }
+
+    #tblPosicion_filter label{
+        margin-left:20px;
+    }
+
+    #tblPosicion_filter input :focus-within label{
+        border-color:forestgreen;
+    }
+
+    /* Hacer el input más grande */
+    #tblPosicion_filter input {
+        width: 45vh; /* Ajustar el ancho del input de búsqueda */
+        font-size: 16px; /* Ajustar el tamaño del texto */
+        border: 1px solid #ccc; /* Borde inicial */
+        outline: none; /* Elimina el borde por defecto del navegador */
+        transition: border-color 0.9s ease, box-shadow 0.3s ease; /* Suaviza las transiciones */
+    }
+     #tblPosicion_filter input:focus {
+        border-color: forestgreen; /* Cambia el borde a verde cuando esté enfocado */
+            box-shadow: 0 0 5px forestgreen; /* Agrega una sombra verde */
+     }
+</style>
+
+
+<div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <!-- Cambia 'modal-lg' a 'modal-xl' para hacerlo más grande -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pdfModalLabel">Visualización del PDF</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe id="pdfViewer" src="" width="100%" height="800px" style="border: none;"></iframe> <!-- Ajusta la altura del iframe según sea necesario -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">ADMINISTRACION DE POSICIONES </h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+      
+        <div class="row mb-2">
+
+                @using (Html.BeginForm("FiltrarPosiciones", "Posicion", FormMethod.Post, new { id = "formFiltro" }))
+                {
+                    <div class="col-12 col-sm-12 col-xl-12 col-md-12 col-lg-12">
+                        <div class="form-group">
+                        <label for="cmbBodegaPosicion">Bodegas:</label>
+                        <select id="cmbBodegaPosicion" class=" select2 form-control" name="codigoBodega" onchange="document.getElementById('formFiltro').submit();">
+                            <option value="">SELECCIONAR LA BODEGA</option>
+                            @foreach (var bodega in ViewBag.Bodegas as List<BodegaDto>)
+                            {
+                                <option value="@bodega.strCodBodega">@bodega.strCodBodega - @bodega.strBodega</option>
+                            }
+                        </select>
+                    </div>
+                    </div>
+                    
+                }
+
+        </div>
+
+                <div style="padding-bottom:2%">
+                   
+
+                    <div class="col-md-12">
+                        <hr class="my-2" />
+                        <div class="card" style=" ">
+
+                            <div class="table-responsive text-nowrap">
+
+                                @await Html.PartialAsync("_TablePosiciones", posicion)
+                           
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+
+        
+    </div>
+</div>
+<div class="agregar">
+    <a asp-action="Create" asp-controller="Posicion"  class="btn"> <i style="color:white" class="fas fa-plus"></i></a>
+</div>
+
+
+@section ScritpPosicion{
+    <script>
+   
+        $(document).ready(()=>{
+
+
+            $(document).on('click', '.btnImprimirPdf', function () {
+                var idSolicitud = $(this).data('id-posicion');
+                var viewPdfUrl = `/viewPdf?id=${idSolicitud}`;
+
+                // Establece la URL del PDF en el iframe del modal
+                $('#pdfViewer').attr('src', viewPdfUrl);
+
+                // Muestra el modal
+                $('#pdfModal').modal('show');
+            });
+
+            $('#tblPosicion').DataTable({
+                "dom": '<"row"<"col-md-12"f>>rt<"bottom"lp><"clear">',
+                "bDeferRender": true,
+               
+                "pageLength": 10,
+                "searching": true,
+                "autoWidth": true,
+                "lengthChange": false,
+                "info":false,
+                "language": {
+                    "emptyTable": "NO HAY DATOS REGISTRADOS",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "infoFiltered": "(Filtrado de _MAX_ total registros)",
+                    "search": "<b>BUSCAR: </b>",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+
+        })
+    </script>
+}

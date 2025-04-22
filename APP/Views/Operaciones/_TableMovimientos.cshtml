@@ -1,0 +1,34 @@
+﻿@using Api.Dtos.Common
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="col-md-12 col-lg-12 col-xl-12 col-12 col-sm-12">
+<table id="tblPosicion" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>BODEGA</th>
+            <th>DESCRIPCION</th>
+            <th>Nº DOCUMENTO</th>
+            <th>TIPO MOVIMIENTO</th>
+            <th>FECHA</th>
+            <th>ACCION</th>
+        </tr>
+    </thead>
+    <tbody>
+         @foreach(var movimiento in Model)
+         {
+            <tr>  
+                <td>@movimiento.strCodSucursal</td>
+                <td>@movimiento.strDescripcion</td>
+                <td>@movimiento.strNumeroDocumento</td>
+                <td>@movimiento.strTipoMovimiento</td>
+                <td>@movimiento.datFechaCrea</td>
+                <td><a class="btn btn-success" style="color:white"><i class="fa fa-book"></i></a></td>    
+            </tr>
+         }
+    </tbody>
+</table>
+</div>

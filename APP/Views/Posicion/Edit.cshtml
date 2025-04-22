@@ -1,0 +1,279 @@
+﻿@using Api.Dtos.Bodega
+@using Api.Dtos.Posicion
+@model Api.Dtos.Posicion.PosicionDto;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var bodegas = ViewBag.Bodegas as List<BodegaDto>;
+    var posicion = ViewBag.sucursal;
+    var bogPosicion = posicion;
+    var CapPosicion = ViewBag.VarTipoPosicion;
+    var imgPath = ViewBag.ImagePath;
+    var tipoPosicion = ViewBag.TipoPosicion as List<TipoPosicionDto>;
+}
+
+
+<div class="card card-primary">
+<div class="card-header" style="background-color:#1b5e20 ">
+    <h3 class="card-title">EDITANDO POSICICION </h3>
+
+    <div class="card-tools">
+        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+    </div>
+</div>
+<div class="card-body">
+
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-2 col-md-2" style="display:none;">
+                    <div class="form-group">
+                        <input type="hidden" asp-for="intIdPosicion" />
+                        <input type="hidden" asp-for="imgCodigoBarra"/>
+                    </div>
+
+                </div>
+
+                <div class="col-12 col-md-4 col-sm-12 col-lg-4 col-xl-4">
+                    <div class="form-group">
+                        <label class="form-label">BODEGA</label>
+                        <select id="cmbBodegaPosicion" asp-for="strCodSucursal" class="form-control select2">
+                            @foreach (var bodega in bodegas)
+                            {
+                                if (bodega.strCodBodega == bogPosicion)
+                                {
+                                    <option value="@bodega.strCodBodega" selected>@bodega.strCodBodega - @bodega.strBodega</option>
+                                }
+                                else
+                                {
+                                    <option value="@bodega.strCodBodega">@bodega.strCodBodega - @bodega.strBodega</option>
+                                }
+
+                            }
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 col-sm-12 col-lg-4 col-xl-4">
+                    <div class="form-group">
+                        <label class="form-label">POSICION</label>
+                        <input id="txtPosicion" asp-for="strPosicion" class="form-control" type="text" />
+                        <span asp-validation-for="strPosicion" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4 col-sm-12 col-lg-3 col-xl-4">
+                    <div class="form-group">
+                        <label class="form-label">DESCRIPCION</label>
+                        <textarea asp-for="strDescripcion" class="form-control"></textarea>
+                        <span asp-validation-for="strPosicion" class="text-danger"></span>
+                    </div>
+                </div>
+
+              
+
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">CLASIFICIACION</label>
+                        <select asp-for="intIdTipoPosicion" class="form-control select2">
+                            @foreach (var pos in tipoPosicion)
+                            {
+                                if (pos.intIdTipoPosicion == CapPosicion)
+                                {
+                                    <option value="@pos.intIdTipoPosicion">@pos.strTipoPosicion</option>
+                                }
+                                else
+                                {
+                                    <option value="@pos.intIdTipoPosicion">@pos.strTipoPosicion</option>
+                                }
+                            }
+
+                        </select>
+                        <span asp-validation-for="intIdTipoPosicion" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">CAPACIDAD </label>
+                        <input id="strPoscionCreatePosicion" asp-for="decCapacidad" type="number" class="form-control" />
+                        <span asp-validation-for="decCapacidad" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-5 col-sm-12 col-lg-5 col-xl-5">
+                    <div class="form-group">
+                        <label class="form-label">CODIGO BARRA</label>
+
+                        <canvas style="height:40%;" id="barcodeCanvas" class="form-control"></canvas>
+                        <input asp-for="imgArchivo" class="large-file-input" type="file" id="barcodeInput" style="display: none;" />
+                    </div>
+                </div>
+
+            </div>
+            <br />
+            <br />
+            <div class="row">
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button id="guardar" type="submit" class="form-control btn btn-success">GUARDAR</button>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button asp-action="Index" class="form-control btn btn-danger">CANCELAR</button>
+                </div>
+            </div>
+    </form>
+  
+
+
+</div>
+</div>
+@section scriptPosicionEdit{
+
+<script>
+
+        @if (Convert.ToBoolean(TempData["IsSuccess"]))
+        {
+            <text>
+                Swal.fire({
+                    icon: '@TempData["MessageType"]', // "success" o "error"
+                    title: '@TempData["Message"]'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/Posicion/Index'; // Cambia 'TuControlador' por el nombre correcto
+                    }
+                });
+            </text>
+        }
+  
+        window.onload = function () {
+            var canvas = document.getElementById('barcodeCanvas');
+            var ctx = canvas.getContext('2d');
+            var img = new Image();
+            
+            var imagePath = '@ViewBag.ImagePath'; 
+            var imageName = imagePath.split('\\').pop();
+            console.log('@imgPath');
+
+            // URL de la imagen para cargarla en el canvas
+            var imageUrl = '@Url.Action("GetImage", "Posicion", new { imageName = ViewBag.ImagePath })';
+
+            // Cargar la imagen en el canvas
+            img.onload = function () {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                canvas.toBlob(function (blob) {
+                    // Crear el archivo con el nombre extraído de la URL
+                    var file = new File([blob], imageName, { type: "image/png" });
+
+                    // Asignar el archivo al input
+                    var input = document.getElementById('barcodeInput');
+                    var dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files; // Asignar el archivo al input de tipo file
+
+                    // Verificar en la consola que el nombre del archivo se ha asignado correctamente
+                    console.log('Archivo asignado al input:', input.files[0].name);
+                }, 'image/png');
+            };
+
+            // Establecer la URL de la imagen para cargarla en el canvas
+            img.src = imageUrl;
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtener los elementos necesarios
+            const barcodeCanvas = document.getElementById('barcodeCanvas');
+            const txtPosicion = document.getElementById('txtPosicion');
+            const cmbBodegaPosicion = document.getElementById('cmbBodegaPosicion');
+            const barcodeInput = document.getElementById('barcodeInput');
+           // const btnQuitarCodigo = document.getElementById('btnQuitarCodigo');
+           // const btnGenerarCodigo = document.getElementById('btnGenerarCodigo');
+
+            // Evento: Detectar cambios en el campo "txtPosicion" o "cmbBodegaPosicion"
+            txtPosicion.addEventListener('input', generarCodigoBarras);
+                cmbBodegaPosicion.onchange = () => {
+                generarCodigoBarras();
+            };
+
+            // Función para generar código de barras
+            function generarCodigoBarras() {
+                const valorPosicion = txtPosicion.value.trim(); // Obtener valor del input "POSICIÓN"
+                const valorSucursal = cmbBodegaPosicion.value.split('-')[0].trim(); // Extraer SUCURSAL
+
+                if (!valorPosicion || !valorSucursal) {
+                    barcodeCanvas.style.display = "none"; // Ocultar canvas si faltan datos
+                    barcodeInput.value = ""; // Limpiar input file
+                   // btnGenerarCodigo.style.display = "inline-block";
+                    //btnQuitarCodigo.style.display = "none";
+                    return;
+                }
+
+                // Generar el nombre de la imagen: POSICION + SUCURSAL
+                const nombreImagen = `${valorPosicion}_${valorSucursal}.png`;
+
+                // Generar código de barras con JsBarcode
+                JsBarcode(barcodeCanvas, valorPosicion, {
+                    format: "CODE128",
+                    displayValue: true, // Muestra el texto del código
+                    lineColor: "#000",
+                    width: 5,
+                    height: 220,
+                });
+
+                // Mostrar el canvas y ajustar botones
+                barcodeCanvas.style.display = "block";
+               // btnQuitarCodigo.style.display = "inline-block";
+               // btnGenerarCodigo.style.display = "none";
+
+                // Convertir el canvas a una imagen base64
+                const imageData = barcodeCanvas.toDataURL("image/png");
+
+                // Simular que se carga el archivo en el input
+                const file = dataURLtoFile(imageData, nombreImagen);
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                barcodeInput.files = dataTransfer.files;
+
+                console.log("Nombre del archivo asignado:", barcodeInput.files[0].name);
+            }
+
+            // Evento: Quitar código de barras
+          /*  btnQuitarCodigo.addEventListener('click', function () {
+                const context = barcodeCanvas.getContext('2d');
+                context.clearRect(0, 0, barcodeCanvas.width, barcodeCanvas.height); // Limpia el canvas
+
+                // Ocultar elementos
+                barcodeCanvas.style.display = "none";
+                btnQuitarCodigo.style.display = "none";
+                btnGenerarCodigo.style.display = "inline-block";
+
+                // Limpiar el input file
+                barcodeInput.value = "";
+            });*/
+
+            // Función para convertir base64 a un archivo
+            function dataURLtoFile(dataurl, filename) {
+                const arr = dataurl.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new File([u8arr], filename, { type: mime });
+            }
+
+      
+           
+        });
+
+
+
+</script>
+
+}

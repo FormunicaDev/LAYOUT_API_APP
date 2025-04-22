@@ -1,0 +1,392 @@
+﻿@using Api.Dtos.Articulo
+@using Api.Dtos.Bodega
+
+
+@{
+    var bodegas = ViewBag.Bodegas as List<BodegaDto>;
+    var articulo = ViewBag.Articulo as List<ArticuloDto>;
+}
+<style>
+    #interactive {
+        width: 100%;
+        max-width: 640px; /* Ajusta el tamaño máximo */
+        height: 250px; /* Mantén las proporciones */
+        margin: 0 auto; /* Centrar en la pantalla */
+        border: 1px solid #ccc;
+        position: relative;
+        overflow: hidden;
+        touch-action: none;
+    }
+
+        #interactive.zoomed {
+            transform: scale(0.8); /* Reducir el tamaño al 80% */
+            transform-origin: center; /* Mantener el centro como punto de referencia */
+        }
+
+    table th {
+        width: 30%;
+        background-color: #1b5e20;
+        color: white;
+    }
+
+    .table td {
+        width: 70%;
+    }
+    /* Ajuste para mejorar el diseño en pantallas más pequeñas */
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .agregar {
+        position: fixed;
+        bottom: 10%;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        font-size: 24px;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+
+        .agregar:hover {
+            background-color: #218838;
+        }
+</style>
+
+
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">BUSQUEDA ARTICULO </h3>
+        <div class="card-tools">
+            <button id="btnCodigoBarra" type="button" class="btn btn-tool"><i class="fas fa-barcode fa-2x"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+
+        <div class="row justify-content-center align-items-center" style="text-align:center;">
+            <div id="camara" class="card" style="display:none">
+                <div class="card-header" style="display:inline-flex; text-align:center;">
+                    <h5>ESCANEO (POSICION / NUM.PARTE)</h5>
+                    <!-- Botón para ocultar -->
+                    &nbsp;&nbsp;&nbsp;&nbsp;<button style="padding:2% 4% ;" id="btnOcultar" class="btn btn-danger btn-sm float-right"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Haz clic para cerrar esta tarjeta">
+                         X
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">BODEGA</label>
+                                <select id="cmbSucursalCodBarra" class="select2 form-control">
+                                    @foreach (var bog in bodegas)
+                                    {
+                                        <option value="@bog.strCodBodega">@bog.strCodBodega - @bog.strBodega</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group">
+                                <label class="form-label">CODIGO</label>
+                                <input class="form-control" id="txtCodigoBarra" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="row">
+
+
+            <div class="col-12 col-lg-4 col-md-6 col-sm-12 col-xl-3">
+                <div class="form-group">
+                    <label for="cmbCentroCostoEncabezadoPrincipal" class="col-form-label">BODEGA ( * )</label>
+                    <select id="cmbBodega" class="select2 form-control">
+                        @foreach (var bog in bodegas)
+                        {
+                            <option value="@bog.strCodBodega">@bog.strCodBodega - @bog.strBodega</option>
+                        }
+
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-sm-12 col-xl-4 col-12 col">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label for="cmbArticulo" class="col-form-label">BUSCAR ARTICULO ( * )</label>
+                        <div class="d-flex">
+                            <select id="cmbArticulo" class="select2 form-control">
+                               
+                            </select>&nbsp;
+
+                            <button id="btnBUscarArticulo" class="btn btn-success btn-sm ms-2" style="height: auto; width:15%;background-color:#1b5e20;"  data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="BUSCAR ARTICULOS"><i class="fa fa-search"></i></button>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+        </div>
+
+        <div id="resultTables" class="row">
+        </div>
+    </div>
+</div>
+
+
+@section ScriptBuscarArticulo {
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+    <script>
+
+
+        $(document).ready(function () {
+
+
+            let selectInitialized = false; // Para evitar múltiples cargas
+
+            $('#cmbArticulo').select2({
+                ajax: {
+                    url: '/Operaciones/BuscarArticulo',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { strBusqueda: params.term || "" }; // Enviar término de búsqueda
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.data.map(item => ({
+                                id: item.id,    // El ID debe coincidir con el JSON
+                                text: item.text // Texto mostrado en Select2
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                allowClear: true,
+                language: {
+                    noResults: () => "NO SE ENCONTRO LO BUSCADO",
+                    searching: () => "BUSCANDO...",
+                    inputTooShort: () => "AL MENOS 1 CARACTER",
+                    loadingMore: () => "CARGANDO MAS RESULTADOS...",
+                    errorLoading: () => "ERROR AL CARGAR INTENTE DE NUEVO"
+                },
+                placeholder: "INGRESE SU BUSQUEDA",
+                theme: "bootstrap4"
+            });
+
+            $(document).on('click', '#btnOcultar', function (){
+
+                $('#camara').hide();
+            
+            })
+
+            $("#txtCodigoBarra").keypress(function (e) {
+                if (e.which === 13) { // Código de tecla para Enter
+                    e.preventDefault();
+
+                    $('#camara').hide();
+                    const codigo = $("#txtCodigoBarra").val();
+                    const bodega = $("#cmbSucursalCodBarra").val();
+
+                    if (codigo.trim() === "" || !bodega) {
+                        alert("Por favor, selecciona una bodega y escribe un código.");
+                        return;
+                    }
+
+                    // Realizar solicitud AJAX al controlador
+                    $.ajax({
+                        url: '/Articulo/Get_Articulo_Posicion_NumParte', // Ajusta la ruta si es necesario
+                        type: 'GET',
+                        data: {
+                            strCodSucursal: bodega,
+                            strCodArticulo: codigo
+                        },
+                        success: function (response) {
+                            if (response.result && response.result.length > 0) {
+                                $("#resultTables").empty(); // Limpiamos el contenedor
+
+                                response.result.forEach((articulo) => {
+                                    const cardHtml = `
+                                                <div class="col-md-6 col-12">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <table class="table table-bordered">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th scope="row">Numero Parte</th>
+                                                                        <td>${articulo.strNumeroParte}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th scope="row">Descripción</th>
+                                                                        <td>${articulo.strDescripcion}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th scope="row">Código</th>
+                                                                        <td>${articulo.strCodArticulo}</td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <th scope="row">Posicion</th>
+                                                                                <td>${articulo.strPosicion} </td>
+                                                                    </tr>
+
+
+                                                                          <tr>
+                                                                                <th scope="row">Stock Disponible</th>
+                                                                                                <td>${articulo.decCantidadDisponible} (${articulo.strUnidadMedida})</td>
+                                                                            </tr>
+                                                                    <tr>
+                                                                        <th scope="row">Acciones</th>
+                                                                        <td>
+                                                                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                                                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                                                                            <button class="btn btn-secondary btn-sm">
+                                                                                <i class="fas fa-truck"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `;
+
+                                    // Añadir la tarjeta al contenedor
+                                    $("#resultTables").append(cardHtml);
+                                });
+                                $('#txtCodigoBarra').val('');
+                            } else {
+                                $("#resultTables").html(`
+            <div class="col-md-12 col-lg-12" style="text-align: center;">
+                <p style="color: red; font-weight: bold;">No se encontraron resultados para el código ingresado.</p>
+            </div>
+        `);
+                            }
+                        },
+                        error: function (error) {
+                            console.error("Error al obtener los datos:", error);
+                            alert("Hubo un error al buscar los artículos.");
+                        }
+                    });
+                }
+            });
+
+            $(document).on('click', '#btnBUscarArticulo', function () {
+                let articulo = $('#cmbArticulo').val();
+                let bodega = $('#cmbBodega').val();
+
+                $.ajax({
+                    url: '/Articulo/Get_Articulo_Posicion_NumParte', // Ajusta la ruta si es necesario
+                    type: 'GET',
+                    data: {
+                        strCodSucursal: bodega,
+                        strCodArticulo: articulo
+                    },
+                    success: function (response) {
+                        if (response.result && response.result.length > 0) {
+                            $("#resultTables").empty(); // Limpiamos el contenedor
+
+                            response.result.forEach((articulo) => {
+                                const cardHtml = `
+                                                        <div class="col-md-6 col-12">
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    <table class="table table-bordered">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <th scope="row">Numero Parte</th>
+                                                                                <td>${articulo.strNumeroParte}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Descripción</th>
+                                                                                <td>${articulo.strDescripcion}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Código</th>
+                                                                                <td>${articulo.strCodArticulo}</td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <th scope="row">Posicion</th>
+                                                                                        <td>${articulo.strPosicion} </td>
+                                                                            </tr>
+
+
+                                                                                  <tr>
+                                                                                        <th scope="row">Stock Disponible</th>
+                                                                                                        <td>${articulo.decCantidadDisponible} (${articulo.strUnidadMedida})</td>
+                                                                                    </tr>
+                                                                            <tr>
+                                                                                <th scope="row">Acciones</th>
+                                                                                <td>
+                                                                                    <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                                                                    <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                                                                                    <button class="btn btn-secondary btn-sm">
+                                                                                        <i class="fas fa-truck"></i>
+                                                                                    </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    `;
+
+                                // Añadir la tarjeta al contenedor
+                                $("#resultTables").append(cardHtml);
+                            });
+                            $('#txtCodigoBarra').val('');
+                        } else {
+                            $("#resultTables").html(`
+            <div class="col-md-12 col-lg-12" style="text-align: center;">
+                        </br></br></br><p style="color: red; font-weight: bold;">No se encontraron resultados para el código ingresado.</p>
+            </div>
+        `);
+                        }
+                    },
+                    error: function (error) {
+                        console.error("Error al obtener los datos:", error);
+                        alert("Hubo un error al buscar los artículos.");
+                    }
+                });
+            });
+        });
+
+
+        $(document).on('click', '#btnCodigoBarra', function () {
+            $('#camara').show();
+
+           
+        });
+
+
+        
+    </script>
+}

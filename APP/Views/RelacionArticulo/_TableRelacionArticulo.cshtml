@@ -1,0 +1,40 @@
+﻿@using Api.Dtos.Common;
+@using System.Web
+
+@{
+}
+
+
+<table id="tblRelacionArticulo" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>POSICION</th>
+            <th>ARTICULO</th>
+            <th>DESCRIPCION</th>
+            <th>PESO( KG )</th>
+            <th>PRIORIDAD</th>
+            <th>UNIDAD MEDIDA</th>
+            <th>BODEGA</th>
+            <th>ACTION</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var RelacionArticulo in Model)
+        {
+            <tr>
+                <td>@RelacionArticulo.strPosicion</td>
+                <td>@RelacionArticulo.strCodArticulo</td>
+                <td>@RelacionArticulo.strDescripcionArticulo</td>
+                <td>@RelacionArticulo.decPesoKg</td>
+                <td>@RelacionArticulo.strPrioridad</td>
+                <td>@RelacionArticulo.strUnidadMedida</td>
+                <td>@RelacionArticulo.strCodSucursal</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@HttpUtility.UrlEncode(@EncryptionService.Encrypt(@RelacionArticulo.intIdRelacionArticuloPosicion.ToString()))" style="color:white" class="btn btn-success btn-sm fa fa-edit"></a>
+                  
+                </td>
+              
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,249 @@
+﻿@model Api.Dtos.RelacionArticulo.RelacionArticuloDto;
+@using Api.Dtos.Articulo
+@using Api.Dtos.Bodega
+@using Api.Dtos.Posicion
+@using Api.Dtos.Prioridad
+@using Api.Dtos.UnidadMedida
+
+@{
+    var bodegas = ViewBag.Bodegas as List<BodegaDto>;
+    var posicion = ViewBag.Posiciones as List<PosicionDto> ?? new List<PosicionDto>();
+    var unidadMedida = ViewBag.UnidadMedida as List<UnidadMedidaDto> ?? new List<UnidadMedidaDto>();
+    var articulo = ViewBag.Articulo as List<ArticuloDto> ?? new List<ArticuloDto>();
+    var prioridad = ViewBag.Prioridad as List<PrioridadDto> ?? new List<PrioridadDto>();
+}
+
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">CREAR NUEVO ARTICULO </h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-action="create">
+            <div class="row">
+
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-label">BODEGA</label>
+                        <select id="cmbCodSucursalCreateRelacionArticulo" asp-for="strCodSucursal" class="form-control select2" onchange="this.form.submit();">
+                            <option value="">SELECCIONAR</option>
+                            @foreach (var bodega in ViewBag.Bodegas as List<BodegaDto>)
+                            {
+                                <option value="@bodega.strCodBodega" selected="@(Convert.ToString(ViewBag.BodegaSeleccionada) == bodega.strCodBodega ? "selected" : null)">
+                                    @bodega.strCodBodega - @bodega.strBodega
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">ARTICULOS</label>
+                        <select id="articuloSelect" asp-for="strCodArticulo" class="form-control select2">
+                           
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">PESO(KG)</label>
+                        <input class="form-control" type="number" step="any" asp-for="decPesoKg" />
+                    </div>
+                </div>
+
+
+             
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">PRIORIDAD</label>
+                        <select id="cmbPrioridad" asp-for="intIdPrioridad" class="form-control select2">
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var prio in prioridad)
+                            {
+                                <option value="@prio.intIdPrioridad" selected="@(Convert.ToInt32(ViewBag.PrioridadSeleccionada)==prio.intIdPrioridad?"selected":null)">@prio.strPrioridad</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+               
+             
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">POSICION</label>
+                        <select id="cmbUnidadMedida" asp-for="intIdPosicion" class="form-control select2">
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var p in posicion)
+                            {
+                                <option value="@p.intIdPosicion">@p.strPosicion</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+
+
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">UNIDAD DE MEDIDA</label>
+                        <select id="cmbUnidadMedidaRelacion" asp-for="intIdUnidadMedida"  class="form-control select2">
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var p in unidadMedida)
+                            {
+                                <option value="@p.intIdUnidadMedida" >@p.strUnidadMedida</option>
+
+                            }
+                        </select>
+
+                       
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    
+                        <div class="form-group">
+                            <label class="form-laber">STOCK/UNIDAD: <label class="lblstock"></label></label>
+                            <input asp-for="decUnidadesFisica" value="0" type="number" class="form-control" />
+                        </div>
+                    
+                </div>
+
+            
+               
+            </div>
+            <br />
+            <br />
+            <div class="row">
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button id="guardar" type="submit" class="form-control btn btn-success">GUARDAR</button>
+                </div>
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button asp-action="Index" class="form-control btn btn-danger">CANCELAR</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section ScriptCreateRelacionArticulo{
+
+    <script>
+
+        $(document).ready(() => {
+            let selectInitialized = false; // Para evitar múltiples cargas
+
+            $('#articuloSelect').select2({
+                ajax: {
+                    url: '/Operaciones/BuscarArticulo',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { strBusqueda: params.term || "" }; // Enviar término de búsqueda
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.data.map(item => ({
+                                id: item.id,    // El ID debe coincidir con el JSON
+                                text: item.text // Texto mostrado en Select2
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                allowClear: true,
+                language: {
+                    noResults: () => "NO SE ENCONTRO LO BUSCADO",
+                    searching: () => "BUSCANDO...",
+                    inputTooShort: () => "AL MENOS 1 CARACTER",
+                    loadingMore: () => "CARGANDO MAS RESULTADOS...",
+                    errorLoading: () => "ERROR AL CARGAR INTENTE DE NUEVO"
+                },
+                placeholder: "INGRESE SU BUSQUEDA",
+                theme: "bootstrap4"
+            });
+
+            $('#cmbUnidadMedidaRelacion').on("change", function () {
+                let idUnidadMedida = $(this).val();
+
+                if (idUnidadMedida) {
+                    $.ajax({
+                        url: '/RelacionArticulo/ValueUnidadMedida',
+                        type: 'GET',
+                        data: { intIdUnidadMedida: idUnidadMedida },
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.decCantidadUnidad) {
+                                let cantidadUnidad = parseFloat(response.decCantidadUnidad) || 0;
+                            console.log(cantidadUnidad)
+                                $('#cmbUnidadMedidaRelacion').data('cantidadUnidad', cantidadUnidad);
+                                actualizarStock();
+                            }
+                        },
+                        error: function () {
+                            console.log("Error al obtener la unidad de medida.");
+                        }
+                    });
+                }
+            });
+            $('input[name="decUnidadesFisica"]').on("input", function () {
+                actualizarStock();
+            });
+
+            function actualizarStock() {
+                let cantidadUnidad = $('#cmbUnidadMedidaRelacion').data('cantidadUnidad') || 0;
+                let unidadesFisica = parseFloat($('input[name="decUnidadesFisica"]').val()) || 0;
+                let resultado = cantidadUnidad * unidadesFisica;
+
+                $('.lblstock').text(resultado.toFixed(2)); // Muestra el resultado en el label con 2 decimales
+            }
+
+        });
+
+
+        @if (Convert.ToBoolean(TempData["MostrarMensaje"]))
+        {
+
+            @if (Convert.ToBoolean(TempData["IsSuccess"]))
+            {
+                <text>
+                    Swal.fire({
+                        icon: '@TempData["MessageType"]', // "success" o "error"
+                        title: '@TempData["Message"]'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/RelacionArticulo/Index'; // Cambia 'TuControlador' por el nombre correcto
+                        }
+                    });
+                </text>
+            }
+            else
+
+            {
+                <text>
+                    Swal.fire({
+                    icon: '@TempData["MessageType"]', // "success" o "error"
+                    title: '@TempData["Message"]'
+                    });
+                </text>
+            }
+
+        
+
+
+        }
+
+           
+    
+    </script>
+}
+

@@ -1,0 +1,35 @@
+﻿@using Api.Dtos.Common
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<table id="tblUnidadMedida" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>DESCRIPCION</th>
+            <th>CANTIDAD</th>
+            <th>BODEGA</th>
+            <th>ACCION</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var unidadMedida in Model)
+        {
+            <tr>
+                <td>@unidadMedida.intIdUnidadMedida</td>
+                <td>@unidadMedida.strUnidadMedida</td>
+                <td>@unidadMedida.decCantidadUnidad</td>
+                <td>@(unidadMedida.strCodSucursal == "*" ? "TODAS LAS BODEGAS" : unidadMedida.strCodSucursal)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@EncryptionService.Encrypt(@unidadMedida.intIdUnidadMedida.ToString())" style="color:white" class="btn btn-success btn-sm fa fa-edit"></a>
+
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

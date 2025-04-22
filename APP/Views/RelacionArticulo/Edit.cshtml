@@ -1,0 +1,149 @@
+﻿@using Api.Dtos.Articulo;
+@using Api.Dtos.Bodega;
+@using Api.Dtos.Posicion;
+@using Api.Dtos.Prioridad;
+@using Api.Dtos.UnidadMedida;
+@model Api.Dtos.RelacionArticulo.RelacionArticuloDto;
+
+@{
+    var bodegas = ViewBag.Bodegas as List<BodegaDto>;
+    var posicion = ViewBag.Posiciones as List<PosicionDto>;
+    var unidadMedida = ViewBag.UnidadMedida as List<UnidadMedidaDto> ?? new List<UnidadMedidaDto>();
+    var articulo = ViewBag.Articulo as List<ArticuloDto> ?? new List<ArticuloDto>();
+    var prioridad = ViewBag.Prioridad as List<PrioridadDto> ?? new List<PrioridadDto>();
+}
+
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">EDITAR RELACION ARTICULO </h3>
+
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        
+            <form asp-action="Edit" asp-controller="RelacionArticulo" method="post">
+            <div class="row">
+                <input asp-for="intIdRelacionArticuloPosicion" style="display:none;" />
+
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-label">BODEGA</label>
+                        <select id="cmbCodSucursalCreateRelacionArticulo" asp-for="strCodSucursal" class="form-control select2" onchange="this.form.submit();">
+                            <option value="">SELECCIONAR</option>
+                            @foreach (var bodega in ViewBag.Bodegas as List<BodegaDto>)
+                            {
+                                <option value="@bodega.strCodBodega" selected="@(Convert.ToString(ViewBag.BodegaSeleccionada) == bodega.strCodBodega ? "selected" : null)">
+                                    @bodega.strCodBodega - @bodega.strBodega
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">ARTICULOS</label>
+                        <select id="cmbArticuloCreate" asp-for="strCodArticulo" class="form-control select2">
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var a in articulo)
+                            {
+                                <option value="@a.strCodArticulo" selected="@(Convert.ToString(ViewBag.ArticuloSeleccionada)==a.strCodArticulo?"selected":null)">@a.strCodArticulo - @a.strArticulo</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">PESO(KG)</label>
+                        <input class="form-control" type="number" step="any" asp-for="decPesoKg" />
+                       
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">PRIORIDAD</label>
+                        <select id="cmbPrioridad" asp-for="intIdPrioridad" class="form-control select2">
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var prio in prioridad)
+                            {
+                                <option value="@prio.intIdPrioridad" selected="@(Convert.ToInt32(ViewBag.PrioridadSeleccionada)==prio.intIdPrioridad?"selected":null)">@prio.strPrioridad</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">POSICION</label>
+                        <select id="cmbUnidadMedida" asp-for="intIdPosicion" class="form-control select2">
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var p in posicion)
+                            {
+                                <option value="@p.intIdPosicion">@p.strPosicion</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">UNIDAD DE MEDIDA</label>
+                        <select id="cmbUnidadMedidaRelacion" asp-for="intIdUnidadMedida" class="form-control select2">
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var p in unidadMedida)
+                            {
+                                <option value="@p.intIdUnidadMedida">@p.strUnidadMedida</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">STOCK </label>
+                        <input asp-for="decUnidadesFisica" type="number" class="form-control" disabled />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button id="guardar" type="submit" class="form-control btn btn-success">GUARDAR</button>
+                </div>
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button asp-action="Index" class="form-control btn btn-danger">CANCELAR</button>
+                </div>
+            </div>
+            </form>
+       
+    </div>
+</div>
+
+
+@section ScritpEditRelacionArticulo {
+
+    <script>
+        @if (Convert.ToBoolean(TempData["IsSuccess"]))
+        {
+            <text>
+                Swal.fire({
+                    icon: '@TempData["MessageType"]', // "success" o "error"
+                    title: '@TempData["Message"]'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/RelacionArticulo/Index'; // Cambia 'TuControlador' por el nombre correcto
+                    }
+                });
+            </text>
+        }
+    </script>
+}

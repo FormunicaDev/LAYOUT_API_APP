@@ -1,0 +1,79 @@
+﻿@using Api.Dtos.Bodega
+@using Api.Dtos.Movimientos;
+
+@{
+    var Bodega = ViewBag.ListBodegas as List<BodegaDto>;
+    var TipoMovimiento = ViewBag.ListTipoMovimiento as List<TipoMovimientoDto>;
+    var MovimientoHeader = ViewBag.ListMovimientoHeader as List<ResponseHeaderDtoXTipoMov>;
+}
+
+<style>
+    .agregar {
+        position: fixed;
+        bottom: 10%;
+        right: 20px;
+        background-color: #28a745;
+        color: white;
+        font-size: 24px;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+
+        .agregar:hover {
+            background-color: #218838;
+        }
+</style>
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">MOVIMIENTOS DE INVENTARIOS </h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 col-xl-3 col-lg-3 col-12 col-sm-12">
+                <div class="form-group">
+                    <label class="form-label">BODEGAS</label>
+                    <select class="form-control select2">
+                        @foreach(var bodega in Bodega)
+                        {
+                            <option value="@bodega.strCodBodega">@bodega.strCodBodega - @bodega.strBodega</option>
+                        }
+                       
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-xl-3 col-lg-3 col-12 col-sm-12">
+                <div class="form-group">
+                    <label class="form-label">BODEGAS</label>
+                    <select class="form-control select2">
+                        @foreach (var tipoMovimiento in TipoMovimiento)
+                        {
+                            <option value="@tipoMovimiento.intIdTipoMovimiento">@tipoMovimiento.strTipoMovimiento</option>
+                        }
+
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive text-nowrap">
+                @await Html.PartialAsync("_TableMovimientos", MovimientoHeader)
+            </div>
+        </div>      
+    </div>
+
+</div>
+
+<div class="agregar">
+    <a asp-action="CreateMovimiento" asp-controller="Operaciones" class="btn"> <i style="color:white" class="fas fa-plus"></i></a>
+</div>

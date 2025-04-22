@@ -1,0 +1,505 @@
+﻿@using Api.Dtos.Bodega
+@using Api.Dtos.Movimientos
+@using Api.Dtos.Posicion
+@using Api.Dtos.Prioridad
+@using Api.Dtos.UnidadMedida
+
+@{
+    var TipoMovimiento = ViewBag.ListTipoMovimiento as List<TipoMovimientoDto>;
+    var prioridad = ViewBag.Prioridad as List<PrioridadDto> ?? new List<PrioridadDto>();
+    var unidadMedida = ViewBag.UnidadMedida as List<UnidadMedidaDto> ?? new List<UnidadMedidaDto>();
+    var posicion = ViewBag.Posiciones as List<PosicionDto> ?? new List<PosicionDto>();
+
+}
+
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">MOVIMIENTOS DE INVENTARIOS </h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12 ">
+                <div class="form-group">
+                    <label class="form-label">TIPO</label>
+                    <select id="cmbTipoMovimiento" class="form-control select2">
+                        @foreach (var tipoMovimiento in TipoMovimiento)
+                        {
+                            <option value="@tipoMovimiento.intIdTipoMovimiento">@tipoMovimiento.strTipoMovimiento</option>
+                        }
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12 ">
+                <div class="form-group">
+                    <label class="form-label">NUMERO DOCUMENTO</label>
+                    <input id="strNumeroDocumento" class="form-control" />
+
+                </div>
+            </div>
+
+            <div class="col-md-5 col-lg-5 col-xl-5 col-12 col-sm-12 ">
+                <div class="form-group">
+                    <label class="form-label">DESCRIPCION</label>
+                    <div class="input-group">
+                        <input id="strDescripcion" class="form-control" />
+                        <div style="margin-left:10%; background-color:#1b5e20; border-radius:50%;" class="input-group-append">
+                            <a class="btn" id="btnGuardarEncabezado" data-toggle="tooltip" data-placement="top" title="Guardar"><i class="fa fa-save text-white"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+         <form asp-action="CreateMovimiento">
+            <div class="row divCreate">
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-label">BODEGA</label>
+                        <select id="cmbBodega" class="form-control select2">
+                            @foreach (var bodega in ViewBag.ListBodegas as List<BodegaDto>)
+                            {
+                                <option value="@bodega.strCodBodega" selected="@(Convert.ToString(ViewBag.BodegaSeleccionada) == bodega.strCodBodega ? "selected" : null)">
+                                    @bodega.strCodBodega - @bodega.strBodega
+                                </option>
+                            }
+                        </select>
+
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">ARTICULOS</label>
+                        <select id="articuloSelect" class="form-control select2">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">POSICION</label>
+                        <select id="cmbPosicion" class="form-control select2" disabled>
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var p in posicion)
+                            {
+                                <option value="@p.intIdPosicion">@p.strPosicion</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">UNIDAD DE MEDIDA</label>
+                        <select id="cmbUnidadMedida" class="form-control select2" disabled>
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var p in unidadMedida)
+                            {
+                                <option value="@p.intIdUnidadMedida">@p.strUnidadMedida</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">PRIORIDAD</label>
+                        <select id="cmbPrioridad" class="form-control select2" disabled>
+                            <option value=""> SELECCIONAR</option>
+                            @foreach (var prio in prioridad)
+                            {
+                                <option value="@prio.intIdPrioridad" selected="@(Convert.ToInt32(ViewBag.PrioridadSeleccionada)==prio.intIdPrioridad?"selected":null)">@prio.strPrioridad</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2">
+                    <div class="form-group">
+                        <label class="form-label">STOCK</label>
+
+                        <div class="input-group">
+                            <input class="form-control"  type="number" id="decStock" />
+                            <div style="margin-left:10%; background-color:#1b5e20; border-radius:50%;" class="input-group-append">
+                                <a class="btn" id="btnAgregarDetalle" data-toggle="tooltip" data-placement="top" title="Agregar"><i class="fa fa-plus text-white"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+          
+                @await Html.PartialAsync("_TableOperaciones", null)
+                    
+                
+    </div>
+        </form>
+    </div>
+</div>
+
+@section ScriptCreateMovimiento {
+      <script>
+        $(document).ready(function () {
+            $("#tblOperaciones").DataTable({
+                "dom": '<"row"<"col-md-12"f>>rt<"bottom"lp><"clear">',
+                "bDeferRender": true,
+                "pageLength": 60,
+                "searching": false,
+                "autoWidth": true,
+                "lengthChange": false,
+                "info": false,
+                "language": {
+                    "emptyTable": "NO HAY DATOS REGISTRADOS",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "infoFiltered": "(Filtrado de _MAX_ total registros)",
+                    "search": "<b>BUSCAR: </b>",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+
+            let selectInitialized = false; // Para evitar múltiples cargas
+
+            $('#articuloSelect').select2({
+                ajax: {
+                    url: '/Operaciones/BuscarArticulo',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { strBusqueda: params.term || "" }; // Enviar término de búsqueda
+                    },
+                    processResults: function (data) {
+                        if (!data.success) {
+                            return { results: [] }; // Si no hay resultados, se devuelve vacío
+                        }
+                        return {
+                            results: data.data.map(item => ({
+                                id: item.id,    // ID correcto
+                                text: item.text // Nombre del artículo
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1,
+                allowClear: true,
+                language: {
+                    noResults: () => "NO SE ENCONTRO LO BUSCADO",
+                    searching: () => "BUSCANDO...",
+                    inputTooShort: () => "AL MENOS 1 CARACTER",
+                    loadingMore: () => "CARGANDO MAS RESULTADOS...",
+                    errorLoading: () => "ERROR AL CARGAR INTENTE DE NUEVO"
+                },
+                placeholder: "INGRESE SU BUSQUEDA",
+                theme: "bootstrap4"
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+            $(".divCreate").hide();
+        });
+
+        $("#articuloSelect").on("change", function () {
+            let bod = $("#cmbBodega").val();
+            if (bod && bod.trim() !== "") {
+                cargarPosicion();
+            } else {
+                let posicionSelect = $("#cmbPosicion");
+                posicionSelect.empty();
+                posicionSelect.prop("disabled", true);
+                posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+            }
+        })
+
+        $("#cmbBodega").on("change", function () {
+            let art = $("#articuloSelect").val();
+            if (art && art.trim() !== "") {
+                cargarPosicion();
+            }
+            else {
+                let posicionSelect = $("#cmbPosicion");
+                posicionSelect.empty();
+                posicionSelect.prop("disabled", true);
+                posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+            }
+
+        })
+
+        $("#cmbPosicion").on("change", function () {
+            let art = $("#cmbPosicion").val();
+            if (art && art.trim() !== "") {
+                cargarUnidadMedidas();
+            }
+            else {
+                let posicionSelect = $("#cmbUnidadMedida");
+                posicionSelect.empty();
+                posicionSelect.prop("disabled", true);
+                posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+            }
+
+        })
+
+
+        $("#cmbUnidadMedida").on("change", function () {
+            let id = $("#cmbUnidadMedida").val();
+            if (id && id.trim() !== "") {
+                CargarPrioridad(id);
+            }
+            else {
+                let prioridad = $("#cmbPrioridad");
+                prioridad.empty();
+                prioridad.prop("disabled", true);
+                prioridad.append(`<option value="">SELECCIONAR</option>`);
+            }
+
+        })
+
+
+        $("#btnGuardarEncabezado").on("click", function () {
+
+            let cmbTipoMovimiento = $("#cmbTipoMovimiento").val();
+            let strDescripcion = $("#strDescripcion").val();
+            let strNumeroDocumento = $("#strNumeroDocumento").val();
+            if (cmbTipoMovimiento === "" || strDescripcion === "" || strNumeroDocumento === "") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Campos Vacíos",
+                    text: "Por favor, complete todos los campos antes de continuar.",
+                    confirmButtonText: "Aceptar",
+                    confirmButtonColor: "#3085d6"
+                });
+            } else {
+                // Aquí puedes agregar la lógica para guardar
+                Swal.fire({
+                    icon: "success",
+                    title: "Guardado",
+                    text: "Proceder a llenar lo siguientes campos",
+                    confirmButtonText: "Aceptar",
+                    confirmButtonColor: "#28a745"
+                });
+
+                $("#cmbTipoMovimiento").prop("disabled", true);
+                $("#strDescripcion").prop("disabled", true);
+                $("#strNumeroDocumento").prop("disabled", true);
+                $("#btnGuardarEncabezado").hide(false);
+                $(".divCreate").show();
+            }
+
+        });
+
+        $("#btnAgregarDetalle").on("click", function () {
+            agregraDetalle();
+                
+        })
+
+        let index = 0;
+          function agregraDetalle() {
+              let strCodBodega = $('#cmbBodega').val();
+              let strBodega = $('#cmbBodega option:selected').text();
+              let strCodArticulo = $('#articuloSelect').val();
+              let strArticulo = $('#articuloSelect option:selected').text();
+              let intIdPosicion = $('#cmbPosicion').val();
+              let strPosicion = $('#cmbPosicion option:selected').text();
+              let intIdRelacion = $('#cmbUnidadMedida').val();
+              let strUnidaMedida = $('#cmbUnidadMedida option:selected').text();
+              let intIdPrioridad = $('#cmbPrioridad').val();
+              let decCantidad = $('#decStock').val();
+
+            if (!strCodBodega || !strCodArticulo || !intIdPosicion || !intIdRelacion || !intIdPrioridad || !decCantidad) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Campos incompletos!',
+                    text: 'Por favor, complete todos los campos antes de continuar.'
+                });
+                return; 
+            }
+
+            
+             
+
+              if (index === 0) {
+                $('#tblOperaciones').DataTable().clear().draw();
+                $('#cmbBodega').prop("disabled", true);
+              }
+
+            $('#tblOperaciones').DataTable().row.add([
+                strBodega,
+                strArticulo,
+                decCantidad,
+                strBodega,
+                strUnidaMedida,
+                // Agregar el icono de "Eliminar" de Font Awesome
+                `<a style="color:white;" class="btn btn-danger btn-sm eliminarFila"><i class="fa fa-trash"></i> </a>`
+            ]).draw();
+              index++;
+
+            $('#articuloSelect').val(null).trigger('change');
+            let prioridad = $("#cmbPrioridad");
+            prioridad.empty();
+            prioridad.prop("disabled", true);
+            prioridad.append(`<option value="">SELECCIONAR</option>`);
+           
+        }
+
+        function cargarPosicion() {
+            let strCodArticulo = $("#articuloSelect").val();
+            let strCodSucursal = $("#cmbBodega").val();
+
+            if (strCodArticulo && strCodArticulo.trim() !== "" && strCodSucursal !== "") {
+                $.ajax({
+                    url: "/Operaciones/BuscarPosicion_RelacionArticulo",
+                    type: "GET",
+                    data: { strCodSucursal: strCodSucursal, strCodArticulo: strCodArticulo },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.sucess) {
+
+                            console.log(response)
+                            let posicionSelect = $("#cmbPosicion");
+                            posicionSelect.empty(); // Limpiar opciones anteriores
+                            posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+                            if (response.data.isSuccess) {
+                                if (response.data.data.length > 0) {
+                                    response.data.data.forEach(function (pos) {
+                                        posicionSelect.append(`<option value="${pos.intIdPosicion}">${pos.strDescripcionCompleta} </option>`);
+                                    });
+
+                                   
+
+                                    posicionSelect.prop("disabled", false); // Habilitar select si hay datos
+                                }
+                            } else {
+                                posicionSelect.prop("disabled", true); // Deshabilitar si no hay datos
+                            }
+                        }
+                    },
+                    error: function () {
+                        let posicionSelect = $("#cmbPosicion");
+                        posicionSelect.empty();
+                        posicionSelect.prop("disabled", true);
+                        posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+
+                        let unidadSelect = $("#cmbUnidadMedida");
+                        unidadSelect.empty();
+                        unidadSelect.prop("disabled", true);
+                        unidadSelect.append(`<option value="">SELECCIONAR</option>`);
+
+
+                        console.error("Error al obtener la posición");
+                    }
+
+                });
+            }
+            else {
+                let posicionSelect = $("#cmbPosicion");
+                posicionSelect.empty();
+                posicionSelect.prop("disabled", true);
+                posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+
+                let unidadSelect = $("#cmbUnidadMedida");
+                unidadSelect.empty();
+                unidadSelect.prop("disabled", true);
+                unidadSelect.append(`<option value="">SELECCIONAR</option>`);
+
+            }
+        }
+
+        function cargarUnidadMedidas() {
+            let posicionSelect = $("#cmbPosicion").val();
+            let bodegaSelect = $("#cmbBodega").val();
+            let artSelect = $("#articuloSelect").val();
+
+            if (posicionSelect && posicionSelect.trim() !== "" && bodegaSelect !== "" && bodegaSelect.trim() != "") {
+                $.ajax({
+                    url: "/Operaciones/BuscarUnidadMedida_RelacionArticulo",
+                    type: "GET",
+                    data: { intIdPosicion: posicionSelect, strCodSucursal: bodegaSelect, strCodArticulo: artSelect },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.sucess) {
+
+                            console.log(response)
+                            let unidadMedida = $("#cmbUnidadMedida");
+                            unidadMedida.empty(); // Limpiar opciones anteriores
+
+                            if (response.data.isSuccess) {
+                                if (response.data.data.length > 0) {
+                                    response.data.data.forEach(function (pos) {
+                                        unidadMedida.append(`<option value="${pos.intIdRelacionArticuloPosicion}">${pos.strUnidadMedida} </option>`);
+                                    });
+
+                                    let intIdRelacionArticulo = unidadMedida.val();
+                                    CargarPrioridad(intIdRelacionArticulo);
+                                    unidadMedida.prop("disabled", false); // Habilitar select si hay datos
+                                }
+                            } else {
+                                unidadMedida.prop("disabled", true); // Deshabilitar si no hay datos
+                            }
+                        }
+                    },
+                    error: function () {
+                        let posicionSelect = $("#cmbUnidadMedida");
+                        posicionSelect.empty();
+                        posicionSelect.prop("disabled", true);
+                        posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+                        console.error("Error al obtener la posición");
+                    }
+
+                });
+            }
+            else {
+                let posicionSelect = $("#cmbUnidadMedida");
+                posicionSelect.empty();
+                posicionSelect.prop("disabled", true);
+                posicionSelect.append(`<option value="">SELECCIONAR</option>`);
+            }
+
+        }
+
+        function CargarPrioridad(intIdRelacionArticulo) {
+            $.ajax({
+                url: "/Operaciones/BuscarPrioridad",
+                type: "GET",
+                data: { intIdRelacionArticuloPosicion: intIdRelacionArticulo },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success && response.data && response.data.isSuccess) {
+                        console.log("Respuesta exitosa:", response);
+
+                        let prioridadselect = $("#cmbPrioridad");
+                        /*prioridadselect.empty().append(`<option value="">SELECCIONAR</option>`);  */prioridadselect.empty();
+
+                        let item = response.data.item;
+                        if (item) {
+                            prioridadselect.append(`<option value="${item.intIdPrioridad}">${item.strPrioridad}</option>`);
+                            prioridadselect.prop("disabled", false); // Habilitar select
+                        } else {
+                            prioridadselect.prop("disabled", true); // Deshabilitar si no hay datos
+                        }
+                    } else {
+                       
+                        $("#cmbPrioridad").empty().prop("disabled", true).append(`<option value="">SELECCIONAR</option>`);
+                    }
+                },
+                error: function () {
+                    console.error("Error al obtener prioridades");
+                    $("#cmbPrioridad").empty().prop("disabled", true).append(`<option value="">SELECCIONAR</option>`);
+                }
+            });
+        }
+
+
+      </script>                  
+}

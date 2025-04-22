@@ -1,0 +1,177 @@
+﻿@using Api.Dtos.Bodega
+@using Api.Dtos.Posicion
+@model Api.Dtos.Posicion.PosicionDto;
+@{
+    var bodegas = ViewBag.Bodegas as List<BodegaDto>;
+    var tipoPosicion = ViewBag.TipoPosicion as List<TipoPosicionDto>;
+}
+
+
+
+<div class="card card-primary">
+    <div class="card-header" style="background-color:#1b5e20 ">
+        <h3 class="card-title">CREAR NUEVA POSICICION </h3>
+
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div class="row">
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">BODEGA</label>
+                        <select id="cmbCodSucursalCreatePosicion" asp-for="strCodSucursal" class="form-control select2">
+                            @foreach (var bodega in bodegas)
+                            {
+                                <option value="@bodega.strCodBodega" selected>@bodega.strCodBodega - @bodega.strBodega</option>
+                            }
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-4 col-xl-4 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">POSICION</label>
+                        <input id="strPoscionCreatePosicion" asp-for="strPosicion" type="text" class="form-control" />
+                        <span asp-validation-for="strPosicion" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">DESCRIPCION</label>
+                        <textarea asp-for="strDescripcion" type="text" class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-lg-3 col-xl-3 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">CLASIFICIACION</label>
+                        <select asp-for="intIdTipoPosicion" class="form-control select2">
+                            @foreach (var pos in tipoPosicion)
+                            {
+                                <option value="@pos.intIdTipoPosicion">@pos.strTipoPosicion</option>
+                            }
+
+                        </select>
+                        <span asp-validation-for="intIdTipoPosicion" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-lg-2 col-xl-2 col-12 col-sm-12">
+                    <div class="form-group">
+                        <label class="form-laber">CAPACIDAD </label>
+                        <input id="strPoscionCreatePosicion" asp-for="decCapacidad" type="number" class="form-control" />
+                        <span asp-validation-for="decCapacidad" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-5 col-sm-12 col-lg-5 col-xl-5">
+                    <div class="form-group">
+                        <label class="form-label">CODIGO BARRA</label>
+
+                        <canvas style="height:40%;" id="barcodeCanvas" class="form-control"></canvas>
+                        <input asp-for="imgArchivo" class="large-file-input" type="file" id="barcodeInput" style="display: none;" />
+
+                    </div>
+                </div>
+            </div>
+            <br />
+            <br />
+            <div class="row">
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button id="guardar" type="submit" class="form-control btn btn-success">GUARDAR</button>
+                </div>
+                <div class="col-md-2 col-lg-2 col-xl-2 col-sm-6 col-6">
+                    <button asp-action="Index" class="form-control btn btn-danger">CANCELAR</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section ScriptCreatePosicion {
+    <script>
+        @if (Convert.ToBoolean(TempData["IsSuccess"]))
+        {
+            <text>
+                Swal.fire({
+                    icon: '@TempData["MessageType"]', // "success" o "error"
+                    title: '@TempData["Message"]'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/Posicion/Index'; // Cambia 'TuControlador' por el nombre correcto
+                    }
+                });
+            </text>
+        }
+            document.addEventListener('DOMContentLoaded', function () {
+                const barcodeCanvas = document.getElementById('barcodeCanvas');
+                const txtPosicion = document.getElementById('strPoscionCreatePosicion');
+                const cmbBodegaPosicion = document.getElementById('cmbCodSucursalCreatePosicion');
+                const barcodeInput = document.getElementById('barcodeInput');
+
+                txtPosicion.addEventListener('input', generarCodigoBarras);
+                cmbBodegaPosicion.onchange = () => {
+                    generarCodigoBarras();
+                };
+
+                function generarCodigoBarras() {
+                    const valorPosicion = txtPosicion.value.trim(); // Obtener valor del input "POSICIÓN"
+                    const valorSucursal = cmbBodegaPosicion.value.split('-')[0].trim(); // Extraer SUCURSAL
+
+                    if (!valorPosicion || !valorSucursal) {
+                        barcodeCanvas.style.display = "none"; // Ocultar canvas si faltan datos
+                        barcodeInput.value = ""; // Limpiar input file
+                        // btnGenerarCodigo.style.display = "inline-block";
+                        //btnQuitarCodigo.style.display = "none";
+                        return;
+                    }
+
+                    // Generar el nombre de la imagen: POSICION + SUCURSAL
+                    const nombreImagen = `${valorPosicion}_${valorSucursal}.png`;
+
+                    // Generar código de barras con JsBarcode
+                    JsBarcode(barcodeCanvas, valorPosicion, {
+                        format: "CODE128",
+                        displayValue: true, // Muestra el texto del código
+                        lineColor: "#000",
+                        width: 5,
+                        height: 220,
+                    });
+
+                    // Mostrar el canvas y ajustar botones
+                    barcodeCanvas.style.display = "block";
+                    // btnQuitarCodigo.style.display = "inline-block";
+                    // btnGenerarCodigo.style.display = "none";
+
+                    // Convertir el canvas a una imagen base64
+                    const imageData = barcodeCanvas.toDataURL("image/png");
+
+                    // Simular que se carga el archivo en el input
+                    const file = dataURLtoFile(imageData, nombreImagen);
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    barcodeInput.files = dataTransfer.files;
+
+                    console.log("Nombre del archivo asignado:", barcodeInput.files[0].name);
+                }
+
+                function dataURLtoFile(dataurl, filename) {
+                    const arr = dataurl.split(',');
+                    const mime = arr[0].match(/:(.*?);/)[1];
+                    const bstr = atob(arr[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    return new File([u8arr], filename, { type: mime });
+                }
+            });
+    </script>
+}
+

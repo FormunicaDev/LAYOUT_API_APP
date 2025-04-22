@@ -1,0 +1,114 @@
+﻿
+
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = null;
+    //var acciones = ViewBag.AccionesReintegro as List<AccionesReintegro>;
+}
+
+
+<aside class="main-sidebar sidebar-light-purple elevation-4">
+    <!-- Brand Logo -->
+    <a asp-action="Index" asp-controller="DashBoard" class="brand-link navbar-white">
+        <img src="~/asset/dist/img/logoFormunica.png" alt="Cootel" class="brand-image "
+             style="opacity: .8">
+        <span class="brand-text font-weight-light">FORMUNICA</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+            </div>
+
+            <div class="info">
+                <!-- <a href="#" class="d-block" style="color: #003300;"><?php echo $_SESSION['Usuario']; ?></a>-->
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+                     with font-awesome or any other icon font library -->
+
+                <li class="nav-item has-treeview menu-open">
+                    <a href="#" class="nav-link active" style="background: rgb(0, 51, 0);">
+                        <i class="nav-icon fab fa-buromobelexperte"></i>
+                        <p>
+                            FORMUNICA
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a asp-action="Index" asp-controller="Articulo" class="nav-link">
+                                <i class="fa fa-search"></i>
+                                <p>BUSQUEDA</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-cogs"></i>
+                                <p>ADMINISTRACION</p>
+                            </a>
+                            <ul class="nav nav-treeview" style="padding-left: 10%; list-style: none; margin: 0;">
+
+                                <li class="nav-item">
+                                    <a asp-action="Index" asp-controller="RelacionArticulo" class="nav-link">
+                                        <i class="fa fa-cubes"></i>
+                                        <p>ARTICULOS</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-action="Index" asp-controller="Posicion" class="nav-link">
+                                        <i class="fa fa-map-marker-alt"></i>
+                                        <p>POSICION</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-action="Index" asp-controller="UnidadMedida" class="nav-link">
+                                        <i class="fa fa-balance-scale"></i>
+                                        <p>UND. MEDIDA</p>
+                                    </a>
+                                </li>
+
+                              
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-truck-moving"></i>
+                                <p>OPERACIONES</p>
+                            </a>
+                            <ul class="nav nav-treeview" style="padding-left: 10%; list-style: none; margin: 0;">
+                                <li class="nav-item">
+                                    <a asp-action="Movimientos" asp-controller="Operaciones" class="nav-link">
+                                        <i class="fa fa-exchange-alt"></i>
+                                        <p>MOVIMIENTOS DE INV</p>
+                                    </a>
+                                </li>
+                               
+                            </ul>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a asp-action="Preparacion" asp-controller="Layout" class="nav-link">
+                                <i class="fa fa-list"></i>
+                                <p>PREPARACION</p>
+                            </a>
+                        </li>
+                    </ul>
+
+
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>
