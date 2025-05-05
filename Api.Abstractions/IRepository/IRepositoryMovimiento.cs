@@ -18,6 +18,8 @@ namespace Api.Abstractions.IRepository
         public Task<ResultDto<ResponseUnidadMedidaDto>> GetAll_UnidadMedida_RelacionArticulo(int intIdPosicion, string strCodSucursal,string strCodArticulo);
         public Task<ResultDto<ResponseHeaderDtoXTipoMov>> GetAll_Search_Mov_HeaderxTipoMov(int intIdTipoMovimiento, string strCodSucursal,string strUsuario);
         public Task<ResultDto<PrioridadDto>> GetAll_Prioridad_RelacioArticuloMov(int intIdRelacionArticuloPosicion);
+        public Task<ResultDto<Guid>> tempInsertMovimiento(tempMovimientoRequestDto tempMovimientoRequestDto);
+        public Task<ResultDto<Guid>> tempInsertMovimientoDetalle(tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto);
 
     }
 }

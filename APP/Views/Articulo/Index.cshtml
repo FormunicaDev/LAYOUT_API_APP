@@ -320,30 +320,39 @@
                                                                     <table class="table table-bordered">
                                                                         <tbody>
                                                                             <tr>
-                                                                                <th scope="row">Numero Parte</th>
+                                                                                <th scope="row">NUMERO PARTE</th>
                                                                                 <td>${articulo.strNumeroParte}</td>
                                                                             </tr>
                                                                             <tr>
-                                                                                <th scope="row">Descripción</th>
+                                                                                <th scope="row">DESCRIPCIÓN</th>
                                                                                 <td>${articulo.strDescripcion}</td>
                                                                             </tr>
                                                                             <tr>
-                                                                                <th scope="row">Código</th>
+                                                                                <th scope="row">CÓDIGO</th>
                                                                                 <td>${articulo.strCodArticulo}</td>
                                                                             </tr>
 
                                                                             <tr>
-                                                                                <th scope="row">Posicion</th>
+                                                                                <th scope="row">POSICIÓN</th>
                                                                                         <td>${articulo.strPosicion} </td>
                                                                             </tr>
 
 
-                                                                                  <tr>
-                                                                                        <th scope="row">Stock Disponible</th>
-                                                                                                        <td>${articulo.decCantidadDisponible} (${articulo.strUnidadMedida})</td>
+                                                                                   <tr>
+                                                                                        <th scope="row">STOCK GLOBAL</th>
+                                                                                                        <td>${articulo.decCantidadDisponible} UNIDAD </td>
                                                                                     </tr>
                                                                             <tr>
-                                                                                <th scope="row">Acciones</th>
+
+                                                                             </tr>
+
+
+                                                                                   <tr>
+                                                                                        <th scope="row">STOCK FISICO EN POSICION</th>
+                                                                                                        <td>${articulo.decUnidadesFisica} ${articulo.strUnidadMedida} </td>
+                                                                                    </tr>
+                                                                            <tr>
+                                                                                <th scope="row">ACCIONES</th>
                                                                                 <td>
                                                                                     <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
                                                                                     <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>

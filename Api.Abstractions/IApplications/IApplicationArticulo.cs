@@ -12,6 +12,7 @@ namespace Api.Abstractions.IApplications
     {
         public Task<ResultDto<List<ArticuloDto>>> GetArticulo(string strUsuario);
         public Task<ResultDto<List<DetailArticuloDto>>> GetArticulo_Posicion_NumeroParte(string strCodSucursal, string strArticulo);
-       public Task<ResultDto<ArticuloDto>> SearchArticulo(string strBusqueda);
+        public Task<ResultDto<ArticuloDto>> SearchArticulo(string strBusqueda);
+        
     }
 }

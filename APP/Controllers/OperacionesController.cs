@@ -1,5 +1,6 @@
 ﻿using Api.Dtos.Articulo;
 using Api.Dtos.Bodega;
+using Api.Dtos.Movimientos;
 using Api.Dtos.Posicion;
 using APP.Services.Articulo;
 using APP.Services.Movimiento;
@@ -35,16 +36,18 @@ namespace APP.Controllers
         public async Task<ActionResult> Movimientos()
         {
             var tipoMovimiento = await _movimientos.GetAll_Search_TipoMovimiento(_strToken, 0);
-            ViewBag.ListTipoMovimiento=tipoMovimiento.Data;
+            ViewBag.ListTipoMovimiento = tipoMovimiento.Data;
             ViewBag.ListBodegas = _bodegaDtoJson;
-            var Movimientos = await _movimientos.GetAll_Search_Mov_HeaderxTipoMov(_strToken, 7, _bodegaDtoJson[0].strCodBodega,_usuarioGlobal);
-            ViewBag.ListMovimientoHeader=Movimientos.Data.ToList();
+            ViewBag.strUser=_usuarioGlobal.ToString();
+            var Movimientos = await _movimientos.GetAll_Search_Mov_HeaderxTipoMov(_strToken, 0, _bodegaDtoJson[0].strCodBodega, _usuarioGlobal);
+            ViewBag.ListMovimientoHeader = Movimientos.Data.ToList();
             return View();
         }
 
 
 
         public async  Task<ActionResult> CreateMovimiento() {
+            ViewBag.strUser = _usuarioGlobal.ToString();
             var tipoMovimiento = await _movimientos.GetAll_Search_TipoMovimiento(_strToken, 0);
             ViewBag.ListTipoMovimiento = tipoMovimiento.Data;
             ViewBag.ListBodegas = _bodegaDtoJson;
@@ -52,6 +55,58 @@ namespace APP.Controllers
             ViewBag.UnidadMedida = new List<UnidadMedida>();
 
             return View();
+        }
+
+        public async Task<JsonResult> TempInsertarMovimiento([FromBody] tempMovimientoRequestDto tempMovimientoRequestDto)
+        {
+          
+            var result = await _movimientos.TempInsertMovimiento(_strToken, tempMovimientoRequestDto);
+            try
+            {
+                if (result.IsSuccess && result.Item != Guid.Empty)
+                {
+                    return Json(new
+                    {
+                        isSuccess = true,
+                        item = result.Item
+                    });
+
+                }
+                return Json(new
+                {
+                    isSuccess = false,
+                    item = ""
+                });
+
+            }
+           catch(Exception ex)
+            {
+                return Json(new
+                {
+                    isSuccess = false,
+                    item = result.Item
+                }); 
+            }
+        }
+           
+
+        public async Task<JsonResult> TempInsertarMovimientoDetalle([FromBody] tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto)
+        {
+            var result = await _movimientos.TempInsertMovimientoDetalle(_strToken, tempMovimientoDetalleRequestDto);
+            if (result.IsSuccess && result.Item != Guid.Empty)
+            {
+                return Json(new
+                {
+                    isSuccess = true,
+                    item = result.Item
+                });
+
+            }
+            return Json(new
+            {
+                isSuccess = false,
+                item = ""
+            });
         }
 
         public async Task<JsonResult> BuscarArticulo(string strBusqueda)

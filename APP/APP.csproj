@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Views\Operaciones\Movimientos.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <UpToDateCheckInput Remove="Views\RelacionArticulo\_TableEntrada.cshtml" />
   </ItemGroup>
 

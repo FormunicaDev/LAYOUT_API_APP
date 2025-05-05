@@ -43,11 +43,11 @@
                 <div class="form-group">
                     <label class="form-label">BODEGAS</label>
                     <select class="form-control select2">
-                        @foreach(var bodega in Bodega)
+                        @foreach (var bodega in Bodega)
                         {
                             <option value="@bodega.strCodBodega">@bodega.strCodBodega - @bodega.strBodega</option>
                         }
-                       
+
                     </select>
                 </div>
             </div>
@@ -66,10 +66,12 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-md-12 col-lg-12 col-xl-12 col-12 col-sm-12">
             <div class="table-responsive text-nowrap">
                 @await Html.PartialAsync("_TableMovimientos", MovimientoHeader)
             </div>
-        </div>      
+            </div>
+        </div>
     </div>
 
 </div>
@@ -77,3 +79,38 @@
 <div class="agregar">
     <a asp-action="CreateMovimiento" asp-controller="Operaciones" class="btn"> <i style="color:white" class="fas fa-plus"></i></a>
 </div>
+
+@section scritpMovimiento{
+<script>
+          $(document).ready(function () {
+
+                      $('[data-toggle="tooltip"]').tooltip();
+        $('#tblMovimiento').DataTable({
+                    "dom": '<"row"<"col-md-12"f>>rt<"bottom"lp><"clear">',
+                    "bDeferRender": true,
+
+                    "pageLength": 10,
+                    "searching": true,
+                    "autoWidth": true,
+                    "lengthChange": false,
+                    "info":false,
+                    "language": {
+                        "emptyTable": "NO HAY DATOS REGISTRADOS",
+                        "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                        "lengthMenu": "Mostrar _MENU_ registros",
+                        "infoFiltered": "(Filtrado de _MAX_ total registros)",
+                        "search": "<b>BUSCAR: </b>",
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        }
+                    }
+                });
+                
+            });
+    </script>
+
+}
+

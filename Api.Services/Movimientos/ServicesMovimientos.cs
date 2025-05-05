@@ -52,5 +52,15 @@ namespace Api.Services.Movimientos
         {
             return await _repositoryMovimiento.InsertMovimientoDetail(movimientoRequestDto);
         }
+
+        public async Task<ResultDto<Guid>> tempInsertMovimiento(tempMovimientoRequestDto tempMovimientoRequestDto)
+        {
+            return await _repositoryMovimiento.tempInsertMovimiento(tempMovimientoRequestDto);
+        }
+
+        public async Task<ResultDto<Guid>> tempInsertMovimientoDetalle(tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto)
+        {
+            return await _repositoryMovimiento.tempInsertMovimientoDetalle(tempMovimientoDetalleRequestDto);
+        }
     }
 }

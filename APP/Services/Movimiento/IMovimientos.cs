@@ -14,5 +14,7 @@ namespace APP.Services.Movimiento
         public Task<ResultDto<int>> Insert_MovimientoDetail(string strToken, MovimientoDetailRequestDto movimientoDetailRequestDto);
         public Task<ResultDto<ResponseHeaderDtoXTipoMov>> GetAll_Search_Mov_HeaderxTipoMov(string strToken, int intIdTipoMovimiento, string strCodSucursal,string strUsuario);
         public Task<ResultDto<PrioridadDto>> GetAll_Prioridades_Mov(string strToken, int intIdRelacionArticuloPosicion);
+        public Task<ResultDto<Guid>> TempInsertMovimiento(string strToken, tempMovimientoRequestDto tempMovimientoRequestDto);
+        public Task<ResultDto<Guid>> TempInsertMovimientoDetalle(string strToken, tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto);
     }
 }

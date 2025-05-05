@@ -5,30 +5,63 @@
 @{
 }
 
-<div class="col-md-12 col-lg-12 col-xl-12 col-12 col-sm-12">
-<table id="tblPosicion" class="table table-bordered table-striped">
+
+<table id="tblMovimiento" class=" table table-bordered table-striped">
     <thead>
         <tr>
             <th>BODEGA</th>
             <th>DESCRIPCION</th>
             <th>Nº DOCUMENTO</th>
             <th>TIPO MOVIMIENTO</th>
+            <th>ESTADO</th>
             <th>FECHA</th>
             <th>ACCION</th>
         </tr>
     </thead>
     <tbody>
-         @foreach(var movimiento in Model)
-         {
+        @foreach(var movimiento in Model)
+        {
             <tr>  
                 <td>@movimiento.strCodSucursal</td>
-                <td>@movimiento.strDescripcion</td>
-                <td>@movimiento.strNumeroDocumento</td>
+                <td style="max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                    data-toggle="tooltip" data-placement="right" title="@movimiento.strDescripcion">
+                    @movimiento.strDescripcion
+                </td>
+                <td >@movimiento.strNumeroDocumento</td>
                 <td>@movimiento.strTipoMovimiento</td>
-                <td>@movimiento.datFechaCrea</td>
-                <td><a class="btn btn-success" style="color:white"><i class="fa fa-book"></i></a></td>    
+                <td class="text-center align-middle">
+                    @{
+                        var estado = movimiento.strEstado;
+                        var badgeClass = estado switch
+                        {
+                            "COMPLETADO" => "badge-success",
+                            "PENDIENTE" => "badge-warning text-white",
+                            _ => "badge-secondary"
+                        };
+                    }
+
+                    <span class="badge rounded-pill @badgeClass" style="font-size: 0.9rem; padding: 0.5em 0.9em;">
+                        @estado
+                    </span>
+                </td>
+                <td>@movimiento.datFechaCrea.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white">
+                            
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#"><i class="fa fa-eye"></i> VER </a>
+
+                            @if (movimiento.strEstado == "PENDIENTE")
+                            {
+                                <a  class="dropdown-item" href="#"><i class="fa fa-edit"></i> EDITAR </a>
+                            }
+                        </div>
+                    </div>
+                </td>    
             </tr>
          }
     </tbody>
 </table>
-</div>
+

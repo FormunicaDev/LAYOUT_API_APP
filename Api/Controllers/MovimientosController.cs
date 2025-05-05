@@ -271,6 +271,80 @@ namespace Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        
+        [Authorize]
+        [HttpPost]
+        [Route("TempInsertarMovimiento")]
+        public async Task<ActionResult> TempInsertarMovimiento([FromBody] tempMovimientoRequestDto tempMovimientoRequestDto)
+        {
+            ResultDto<Guid> resultado = new ResultDto<Guid>();
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+                if (identity.Claims.Count() == 0)
+                {
+                    resultado.IsSuccess = false;
+                    resultado.Message = "No tiene permiso contactarse con el administrador";
+                    resultado.Item = Guid.Empty;
+                    return Forbid(resultado.Message);
+                }
+
+                var usuario = identity.Claims.FirstOrDefault(x => x.Type == "strUsuario").Value;
+                var result = await _applicationMovimiento.tempInsertMovimiento(tempMovimientoRequestDto);
+                var jsonResponse = JsonConvert.SerializeObject(new { result });
+                var content = new StringContent(jsonResponse, System.Text.Encoding.UTF8, "application/json");
+                content.Headers.ContentLength = jsonResponse.Length;
+                return new ContentResult
+                {
+                    Content = jsonResponse,
+                    ContentType = "application/json",
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+        [Authorize]
+        [HttpPost]
+        [Route("TempInsertarMovimientoDetalle")]
+        public async Task<ActionResult> TempInsertarMovimientoDetalle([FromBody] tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto)
+        {
+            ResultDto<Guid> resultado = new ResultDto<Guid>();
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+                if (identity.Claims.Count() == 0)
+                {
+                    resultado.IsSuccess = false;
+                    resultado.Message = "No tiene permiso contactarse con el administrador";
+                    resultado.Item = Guid.Empty;
+                    return Forbid(resultado.Message);
+                }
+
+                var usuario = identity.Claims.FirstOrDefault(x => x.Type == "strUsuario").Value;
+                var result = await _applicationMovimiento.tempInsertMovimientoDetalle(tempMovimientoDetalleRequestDto);
+                var jsonResponse = JsonConvert.SerializeObject(new { result });
+                var content = new StringContent(jsonResponse, System.Text.Encoding.UTF8, "application/json");
+                content.Headers.ContentLength = jsonResponse.Length;
+                return new ContentResult
+                {
+                    Content = jsonResponse,
+                    ContentType = "application/json",
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

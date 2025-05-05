@@ -208,7 +208,68 @@ namespace Api.Repository.Movimientos
             }
         }
 
+        public async Task<ResultDto<Guid>> tempInsertMovimiento(tempMovimientoRequestDto tempMovimientoRequestDto)
+        {
+           ResultDto<Guid> result=new ResultDto<Guid>();
+            Guid idUsuario = Guid.NewGuid();
+            try
+            {
+                using (var con=new SqlConnection(_connectionString))
+                {
+                    DynamicParameters dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("@strDescripcion", tempMovimientoRequestDto.strDescripcion);
+                    dynamicParameters.Add("@strNumeroDocumento", tempMovimientoRequestDto.strNumeroDocumento);
+                    dynamicParameters.Add("@intIdTipoMovimiento", tempMovimientoRequestDto.intIdTipoMovimiento);
+                    dynamicParameters.Add("@strUsuario", tempMovimientoRequestDto.strUsuario);
+                    dynamicParameters.Add("@strIdUsuario", idUsuario);
 
-       
+                    Guid repuesta = await con.ExecuteScalarAsync<Guid>("layout.sp_CreateTempMovimientoArticulo", dynamicParameters,commandType:CommandType.StoredProcedure);
+
+                    result.Message = repuesta != Guid.Empty ?"SE GRABO CORRECTAMENTE": "NO SE GRABO";
+                    result.IsSuccess = repuesta != Guid.Empty ? true: false;
+                    result.Item = repuesta != Guid.Empty ? repuesta : Guid.Empty;
+                    return result;
+
+                }
+            }
+            catch (Exception ex) {
+                result.MessageException=ex.Message;
+                result.IsSuccess = false;   
+                return result;
+            }
+        }
+
+        public async Task<ResultDto<Guid>> tempInsertMovimientoDetalle(tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto)
+        {
+            ResultDto<Guid> result = new ResultDto<Guid>();
+
+            try
+            {
+                using (var con = new SqlConnection(_connectionString))
+                {
+                    DynamicParameters dynamicParameters = new DynamicParameters();
+                    dynamicParameters.Add("@intIdRelacionArticuloPosicion", tempMovimientoDetalleRequestDto.intIdRelacionArticuloPosicion);
+                    dynamicParameters.Add("@intIdLinea", tempMovimientoDetalleRequestDto.intIdLinea);
+                    dynamicParameters.Add("@decCantidad", tempMovimientoDetalleRequestDto.decCantidad);
+                    dynamicParameters.Add("@strUsuario", tempMovimientoDetalleRequestDto.strUsuario);
+                    dynamicParameters.Add("@strIdUsuario",tempMovimientoDetalleRequestDto.strIdUsuario, DbType.Guid);
+
+
+                    var repuesta = await con.ExecuteScalarAsync<Guid>("layout.sp_CreateTempMovimientoArticuloDetalle", dynamicParameters, commandType: CommandType.StoredProcedure);
+
+                    result.Message = repuesta != Guid.Empty ? "SE GRABO CORRECTAMENTE" : "NO SE GRABO";
+                    result.IsSuccess = repuesta != Guid.Empty ? true : false;
+                    result.Item = repuesta != Guid.Empty ? repuesta : Guid.Empty;
+                    return result;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                result.MessageException = ex.Message;
+                result.IsSuccess = false;
+                return result;
+            }
+        }
     }
 }

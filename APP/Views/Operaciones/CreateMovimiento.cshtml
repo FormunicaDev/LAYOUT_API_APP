@@ -136,9 +136,9 @@
                         </div>
                     </div>
                 </div>
-          
+                <div class="table-responsive">
                 @await Html.PartialAsync("_TableOperaciones", null)
-                    
+                 </div> 
                 
     </div>
         </form>
@@ -147,69 +147,84 @@
 
 @section ScriptCreateMovimiento {
       <script>
+
         $(document).ready(function () {
-            $("#tblOperaciones").DataTable({
-                "dom": '<"row"<"col-md-12"f>>rt<"bottom"lp><"clear">',
-                "bDeferRender": true,
-                "pageLength": 60,
-                "searching": false,
-                "autoWidth": true,
-                "lengthChange": false,
-                "info": false,
-                "language": {
-                    "emptyTable": "NO HAY DATOS REGISTRADOS",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    "lengthMenu": "Mostrar _MENU_ registros",
-                    "infoFiltered": "(Filtrado de _MAX_ total registros)",
-                    "search": "<b>BUSCAR: </b>",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
-                }
-            });
 
-            let selectInitialized = false; // Para evitar múltiples cargas
 
-            $('#articuloSelect').select2({
-                ajax: {
-                    url: '/Operaciones/BuscarArticulo',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return { strBusqueda: params.term || "" }; // Enviar término de búsqueda
-                    },
-                    processResults: function (data) {
-                        if (!data.success) {
-                            return { results: [] }; // Si no hay resultados, se devuelve vacío
-                        }
-                        return {
-                            results: data.data.map(item => ({
-                                id: item.id,    // ID correcto
-                                text: item.text // Nombre del artículo
-                            }))
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 1,
-                allowClear: true,
-                language: {
-                    noResults: () => "NO SE ENCONTRO LO BUSCADO",
-                    searching: () => "BUSCANDO...",
-                    inputTooShort: () => "AL MENOS 1 CARACTER",
-                    loadingMore: () => "CARGANDO MAS RESULTADOS...",
-                    errorLoading: () => "ERROR AL CARGAR INTENTE DE NUEVO"
-                },
-                placeholder: "INGRESE SU BUSQUEDA",
-                theme: "bootstrap4"
-            });
+             $("#tblOperaciones").DataTable({
+                      columnDefs: [
+                     {
+                         targets: 0,     // La columna 0 es la de 'linea'
+                         visible: false,
+                         searchable: false
+                     }
+                 ],
+                 "dom": '<"row"<"col-md-12"f>>rt<"bottom"lp><"clear">',
+                 "bDeferRender": true,
+                 "pageLength": 60,
+                 "searching": false,
+                 "autoWidth": true,
+                 "lengthChange": false,
+                 "info": false,
+                 "language": {
+                     "emptyTable": "NO HAY DATOS REGISTRADOS",
+                     "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                     "lengthMenu": "Mostrar _MENU_ registros",
+                     "infoFiltered": "(Filtrado de _MAX_ total registros)",
+                     "search": "<b>BUSCAR: </b>",
+                     "paginate": {
+                         "first": "Primero",
+                         "last": "Último",
+                         "next": "Siguiente",
+                         "previous": "Anterior"
+                     }
+                 }
+             });
 
-            $('[data-toggle="tooltip"]').tooltip();
-            $(".divCreate").hide();
-        });
+             let selectInitialized = false; // Para evitar múltiples cargas
+
+             $('#articuloSelect').select2({
+                 ajax: {
+                     url: '/Operaciones/BuscarArticulo',
+                     dataType: 'json',
+                     delay: 250,
+                     data: function (params) {
+                         return { strBusqueda: params.term || "" }; // Enviar término de búsqueda
+                     },
+                     processResults: function (data) {
+                         if (!data.success) {
+                             return { results: [] }; // Si no hay resultados, se devuelve vacío
+                         }
+                         return {
+                             results: data.data.map(item => ({
+                                 id: item.id,    // ID correcto
+                                 text: item.text // Nombre del artículo
+                             }))
+                         };
+                     },
+                     cache: true
+                 },
+                 minimumInputLength: 1,
+                 allowClear: true,
+                 language: {
+                     noResults: () => "NO SE ENCONTRO LO BUSCADO",
+                     searching: () => "BUSCANDO...",
+                     inputTooShort: () => "AL MENOS 1 CARACTER",
+                     loadingMore: () => "CARGANDO MAS RESULTADOS...",
+                     errorLoading: () => "ERROR AL CARGAR INTENTE DE NUEVO"
+                 },
+                 placeholder: "INGRESE SU BUSQUEDA",
+                 theme: "bootstrap4"
+             });
+
+             $('[data-toggle="tooltip"]').tooltip();
+             $(".divCreate").hide();
+         });
+
+          let strIdUsuario;   //
+          let linea = 0;      // lo uso para sabe el ultomo valor de linea usado
+          let index = 0;      // variable la uso para Agregar al detalle de la
+        
 
         $("#articuloSelect").on("change", function () {
             let bod = $("#cmbBodega").val();
@@ -267,45 +282,128 @@
         })
 
 
-        $("#btnGuardarEncabezado").on("click", function () {
+        // Boton que guarda el encabezado 
 
-            let cmbTipoMovimiento = $("#cmbTipoMovimiento").val();
-            let strDescripcion = $("#strDescripcion").val();
-            let strNumeroDocumento = $("#strNumeroDocumento").val();
+        $("#btnGuardarEncabezado").on("click", function () {
+              // Variable extraida de los input,select
+                let cmbTipoMovimiento = $("#cmbTipoMovimiento").val();
+                let strDescripcion = $("#strDescripcion").val();
+                let strNumeroDocumento = $("#strNumeroDocumento").val();
+             // Variable extraida de los input,select
+
+             // Varable Creada con fines de llenar el body que retorno al Controlador
+              
+              let guid = "00000000-0000-0000-0000-000000000000"; // declaracion en vacion interno cambiara el valor
+              let usuario= "@ViewBag.strUser";
+
+             // Varable Creada con fines de llenar el body que retorno al Controlador
+
+             // Valido que los campo que extraigo no venga vacio
             if (cmbTipoMovimiento === "" || strDescripcion === "" || strNumeroDocumento === "") {
                 Swal.fire({
-                    icon: "warning",
-                    title: "Campos Vacíos",
-                    text: "Por favor, complete todos los campos antes de continuar.",
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#3085d6"
-                });
-            } else {
-                // Aquí puedes agregar la lógica para guardar
-                Swal.fire({
-                    icon: "success",
-                    title: "Guardado",
-                    text: "Proceder a llenar lo siguientes campos",
-                    confirmButtonText: "Aceptar",
-                    confirmButtonColor: "#28a745"
-                });
+                              toast: true,
+                              position: 'bottom-end',
+                              icon: 'error',
+                              title: 'Los campo debe estar lleno',
+                              showConfirmButton: false,
+                              timer: 3000,
+                              timerProgressBar: true,
+                              didOpen: (toast) => {
+                                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                                  }
+                         });
+            } 
+            else
+            {
+                // Se arma el body que se enviara al controller
+                 let data = {
+                        strDescripcion: strDescripcion,
+                        strNumeroDocumento: strNumeroDocumento,
+                        intIdTipoMovimiento: parseInt(cmbTipoMovimiento),
+                        strUsuario: usuario,
+                        strIdUsuario: guid
+                 };
+                // Se arma el body que se enviara al controller
 
-                $("#cmbTipoMovimiento").prop("disabled", true);
-                $("#strDescripcion").prop("disabled", true);
-                $("#strNumeroDocumento").prop("disabled", true);
-                $("#btnGuardarEncabezado").hide(false);
-                $(".divCreate").show();
+                 // Llamar al método del servidor
+                $.ajax({
+                  url: '@Url.Action("TempInsertarMovimiento","Operaciones")',
+                  method: 'POST',
+                  contentType: 'application/json',  
+                  data: JSON.stringify(data),        
+                  success: function (response) {
+                        if (response.isSuccess)
+                        {
+                         // Aca Capturo el id que se crearon la tabla temporal para su repectivo uso en el detalle
+                            strIdUsuario=response.item;
+                         // Aca Capturo el id que se crearon la tabla temporal para su repectivo uso en el detall
+
+                            Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: 'Guardado correctamente',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true,
+                                        didOpen: (toast) => {
+                                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                        }
+                            });
+
+                         // Desactivo input y select que ya no sea necesario al momento de que se cree el encabezado 
+                            $("#cmbTipoMovimiento").prop("disabled", true);
+                            $("#strDescripcion").prop("disabled", true);
+                            $("#strNumeroDocumento").prop("disabled", true);
+                            $("#btnGuardarEncabezado").hide();
+                            $(".divCreate").show();
+                         // Desactivo input y select que ya no sea necesario al momento de que se cree el encabezado
+                        } 
+                        else {
+                                Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'error',
+                                        title: 'Ocurrio un error',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true,
+                                            didOpen: (toast) => {
+                                                 toast.addEventListener('mouseenter', Swal.stopTimer)
+                                                 toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                             }
+                                });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                         Swal.fire({
+                                      toast: true,
+                                      position: 'top-end',
+                                      icon: 'error',
+                                      title: 'Error Inesperado',
+                                      showConfirmButton: false,
+                                      timer: 3000,
+                                      timerProgressBar: true,
+                                      didOpen: (toast) => {
+                                          toast.addEventListener('mouseenter', Swal.stopTimer)
+                                          toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                      }
+                             });
+                    }
+                });
             }
-
         });
 
-        $("#btnAgregarDetalle").on("click", function () {
-            agregraDetalle();
-                
+       // Boton que guarda el encabezado
+
+         $("#btnAgregarDetalle").on("click", function () {
+            agregraDetalle();      
         })
 
-        let index = 0;
-          function agregraDetalle() {
+      
+        function agregraDetalle() {
               let strCodBodega = $('#cmbBodega').val();
               let strBodega = $('#cmbBodega option:selected').text();
               let strCodArticulo = $('#articuloSelect').val();
@@ -317,13 +415,23 @@
               let intIdPrioridad = $('#cmbPrioridad').val();
               let decCantidad = $('#decStock').val();
 
+
+
             if (!strCodBodega || !strCodArticulo || !intIdPosicion || !intIdRelacion || !intIdPrioridad || !decCantidad) {
-                Swal.fire({
-                    icon: 'error',
-                    title: '¡Campos incompletos!',
-                    text: 'Por favor, complete todos los campos antes de continuar.'
-                });
-                return; 
+                  Swal.fire({
+                     toast: true,
+                     position: 'top-end',
+                     icon: 'error',
+                     title: 'Los campo debe estar lleno',
+                     showConfirmButton: false,
+                     timer: 3000,
+                     timerProgressBar: true,
+                     didOpen: (toast) => {
+                         toast.addEventListener('mouseenter', Swal.stopTimer)
+                         toast.addEventListener('mouseleave', Swal.resumeTimer)
+                     }
+                 });
+                 return;
             }
 
             
@@ -333,8 +441,37 @@
                 $('#tblOperaciones').DataTable().clear().draw();
                 $('#cmbBodega').prop("disabled", true);
               }
+               console.log(strIdUsuario)
+              linea++;
+              let usuario= "@ViewBag.strUser";
+              let data ={
+                  intIdRelacionArticuloPosicion:parseInt(intIdRelacion),
+                  intIdLinea:parseInt(linea),
+                  decCantidad:parseFloat(decCantidad),
+                  strUsuario:usuario,
+                  strIdUsuario:strIdUsuario
+              };
+
+              let table = $('#tblOperaciones').DataTable();
+            console.log(JSON.stringify(data))
+                    let existe = false;
+                table.rows().every(function () {
+                    let data = this.data();
+                    let idLineaExistente = parseInt(data[0]); // asumiendo que la columna 0 es `intIdLinea`
+
+                    if (idLineaExistente === parseInt(linea)) {
+                        existe = true;
+                        return false; 
+                    }
+                });
+
+                    if (existe) {
+                        alert("Ya existe una fila con esa línea.");
+                        return;
+                    }
 
             $('#tblOperaciones').DataTable().row.add([
+                linea,
                 strBodega,
                 strArticulo,
                 decCantidad,
@@ -343,7 +480,35 @@
                 // Agregar el icono de "Eliminar" de Font Awesome
                 `<a style="color:white;" class="btn btn-danger btn-sm eliminarFila"><i class="fa fa-trash"></i> </a>`
             ]).draw();
-              index++;
+
+             $.ajax({
+                     url: '@Url.Action("TempInsertarMovimientoDetalle", "Operaciones")',
+                   method: 'POST',
+                   contentType: 'application/json',  // Muy importante
+                   data: JSON.stringify(data),        // Convertir objeto JS a JSON
+                   success: function (response) {
+                        if (response.isSuccess) {
+                             $('#decStock').val('');
+                             Swal.fire({
+                      toast: true,
+                      position: 'top-end',
+                      icon: 'successs',
+                      title: 'Se agrego la linea',
+                      showConfirmButton: false,
+                      timer: 3000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                          toast.addEventListener('mouseenter', Swal.stopTimer)
+                          toast.addEventListener('mouseleave', Swal.resumeTimer)
+                      }
+                  });
+                        }
+                   
+                   }
+             
+             });
+              
+            index++;
 
             $('#articuloSelect').val(null).trigger('change');
             let prioridad = $("#cmbPrioridad");
@@ -353,6 +518,7 @@
            
         }
 
+        // carga la posicion segun el articulo
         function cargarPosicion() {
             let strCodArticulo = $("#articuloSelect").val();
             let strCodSucursal = $("#cmbBodega").val();
@@ -416,6 +582,7 @@
             }
         }
 
+        // Caraga al cmb de Unidades de medida
         function cargarUnidadMedidas() {
             let posicionSelect = $("#cmbPosicion").val();
             let bodegaSelect = $("#cmbBodega").val();
@@ -468,6 +635,9 @@
 
         }
 
+
+       //Carga las Prioriade segun el la posicion en que se encuentre el articulo
+
         function CargarPrioridad(intIdRelacionArticulo) {
             $.ajax({
                 url: "/Operaciones/BuscarPrioridad",
@@ -500,6 +670,41 @@
             });
         }
 
+        $('#tblOperaciones').on('click', '.eliminarFila', function() {
+            var boton = $(this); // Guardamos el botón
+            var table = $('#tblOperaciones').DataTable();
+
+            Swal.fire({
+                title: '¿Eliminar línea?',
+                text: "No podrá revertir esto.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e3342f', // Rojo intenso
+                cancelButtonColor: '#6c757d', // Gris oscuro
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'No',
+                customClass: {
+                    popup: 'small-swal' // Clase CSS para hacerlo pequeño
+                }
+            }).then((result) => {
+                 linea--;
+                if (result.isConfirmed) {
+                    // Eliminar la fila
+                    table.row(boton.closest('tr')).remove().draw();
+
+                    // Mostrar Toast de éxito
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Línea eliminada',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                }
+            });
+        });
 
       </script>                  
 }

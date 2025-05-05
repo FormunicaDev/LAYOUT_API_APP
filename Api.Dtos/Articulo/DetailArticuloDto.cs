@@ -16,6 +16,7 @@ namespace Api.Dtos.Articulo
         public int intIdPrioridad { get; set; }
         public string strPrioridad { get; set; }
         public decimal decCantidadDisponible { get; set; }
+        public decimal decUnidadesFisica { get; set; }
         public string strCodSucursal { get; set; }
         public string strUnidadMedida { get; set; }
     }

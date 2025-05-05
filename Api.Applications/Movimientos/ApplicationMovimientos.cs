@@ -53,6 +53,14 @@ namespace Api.Applications.Movimientos
             return await _servicesMovimiento.InsertMovimientoDetail(movimientoRequestDto);
         }
 
-        
+        public async Task<ResultDto<Guid>> tempInsertMovimiento(tempMovimientoRequestDto tempMovimientoRequestDto)
+        {
+            return await _servicesMovimiento.tempInsertMovimiento(tempMovimientoRequestDto);
+        }
+
+        public async Task<ResultDto<Guid>> tempInsertMovimientoDetalle(tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto)
+        {
+            return await _servicesMovimiento.tempInsertMovimientoDetalle(tempMovimientoDetalleRequestDto);
+        }
     }
 }

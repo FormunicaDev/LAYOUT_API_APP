@@ -2,6 +2,7 @@
 using Api.Dtos.Common;
 using Api.Dtos.Movimientos;
 using Api.Dtos.Prioridad;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
@@ -155,7 +156,6 @@ namespace APP.Services.Movimiento
             }
          
         }
-
         public async Task<ResultDto<int>> Insert_MovimientoHeader(string strToken, MovimientoRequestDto movimientoRequestDto)
         {
             var httpClient = new HttpClient();
@@ -178,6 +178,55 @@ namespace APP.Services.Movimiento
                 var errorContent = await response.Content.ReadAsStringAsync();
                 throw new Exception($"Error en la solicitud: {response.StatusCode}, Detalles: {errorContent}");
 
+            }
+        }
+
+        public async Task<ResultDto<Guid>> TempInsertMovimiento(string strToken,tempMovimientoRequestDto tempMovimientoRequestDto)
+        {
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(_baseurl);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", strToken);
+            var content = new StringContent(JsonConvert.SerializeObject(tempMovimientoRequestDto), System.Text.Encoding.UTF8, "application/json");
+
+
+            var response = await httpClient.PostAsync($"Movimientos/TempInsertarMovimiento/", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonConvert.DeserializeObject<ResponseWrapper<ResultDto<Guid>>>(responseContent);
+                return apiResponse.Resultado;
+
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error en la solicitud: {response.StatusCode}, Detalles: {errorContent}");
+
+            }
+        }
+
+        public async Task<ResultDto<Guid>> TempInsertMovimientoDetalle(string strToken, tempMovimientoDetalleRequestDto tempMovimientoDetalleRequestDto)
+        {
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(_baseurl);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", strToken);
+            var content = new StringContent(JsonConvert.SerializeObject(tempMovimientoDetalleRequestDto), System.Text.Encoding.UTF8, "application/json");
+
+
+            var response = await httpClient.PostAsync($"Movimientos/TempInsertarMovimientoDetalle/", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonConvert.DeserializeObject<ResponseWrapper<ResultDto<Guid>>>(responseContent);
+                return apiResponse.Resultado;
+
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error en la solicitud: {response.StatusCode}, Detalles: {errorContent}");
             }
         }
     }
